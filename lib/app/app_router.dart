@@ -1,0 +1,102 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:overwin_mobile/app/layout/app_layout.dart';
+import 'package:overwin_mobile/modules/auth/views/sign_in_screen.dart';
+import 'package:overwin_mobile/modules/auth/views/sign_up_screen.dart';
+import 'package:overwin_mobile/modules/auth/views/email_verification_screen.dart';
+import 'package:overwin_mobile/modules/esports/views/top_competitions_top_esports_screen.dart';
+import 'package:overwin_mobile/modules/esports/views/esport_details_screen.dart';
+import 'package:overwin_mobile/modules/esports/models/e_sport.dart';
+import 'package:overwin_mobile/modules/esports/models/competition.dart';
+import 'package:overwin_mobile/modules/esports/views/competition_details_screen.dart';
+import 'package:overwin_mobile/modules/bets/views/game_details_screen.dart';
+import 'package:overwin_mobile/modules/bets/models/game.dart';
+import 'package:overwin_mobile/modules/profile/views/profile_screen.dart';
+
+// clé pour le ShellNavigator (permet de push des routes tout en gardant AppBar + NavBar)
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+// Global navigator key for deep links
+final globalNavigatorKey = GlobalKey<NavigatorState>();
+
+final GoRouter goRouter = GoRouter(
+  initialLocation: '/paris',
+  navigatorKey: globalNavigatorKey,
+  routes: [
+    /// Routes hors layout : pas d'AppBar/NavBar
+    GoRoute(
+      path: '/signin',
+      builder: (context, state) => const SignInScreen(),
+    ),
+    GoRoute(
+      path: '/signup',
+      builder: (context, state) => const SignUpScreen(),
+    ),
+    GoRoute(
+      path: '/verify-email',
+      builder: (context, state) {
+        final token = state.uri.queryParameters['token'];
+        return EmailVerificationScreen(token: token);
+      },
+    ),
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfileScreen(),
+    ),
+
+    /// ShellRoute avec AppBar + NavBar partagés
+    ShellRoute(
+      navigatorKey: _shellNavigatorKey,
+      builder: (context, state, child) => AppLayout(child: child,),
+      routes: [
+        /// Onglets principaux
+        GoRoute(
+          path: '/esports',
+          builder: (context, state) => const TopCompetitionsTopESportsScreen(),
+        ),
+        GoRoute(
+          path: '/defis',
+          builder: (context, state) => const Center(child: Text('Défis')),
+        ),
+        GoRoute(
+          path: '/paris',
+          builder: (context, state) => const Center(child: Text('Paris')),
+        ),
+        GoRoute(
+          path: '/mes-paris',
+          builder: (context, state) => const Center(child: Text('Mes Paris')),
+        ),
+        GoRoute(
+          path: '/boutique',
+          builder: (context, state) => const Center(child: Text('Boutique')),
+        ),
+
+        /// Page de détail imbriquée : conserve AppBar + NavBar
+        GoRoute(
+          path: '/esport-details',
+          parentNavigatorKey: _shellNavigatorKey,
+          builder: (context, state) {
+            final esport = state.extra as ESport;
+            return EsportDetailsScreen(esport: esport);
+          },
+        ),
+        GoRoute(
+          path: '/competition-details',
+          parentNavigatorKey: _shellNavigatorKey,
+          builder: (context, state) {
+            final competition = state.extra as Competition;
+            return CompetitionDetailsScreen(competition: competition);
+          },
+        ),
+        GoRoute(
+          path: '/game-details',
+          parentNavigatorKey: _shellNavigatorKey,
+          builder: (context, state) {
+            final game = state.extra as Game;
+            return GameDetailsScreen(game: game);
+          },
+        ),
+      ],
+    ),
+  ],
+);
