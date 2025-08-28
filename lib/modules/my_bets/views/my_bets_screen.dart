@@ -13,21 +13,49 @@ class MyBetsScreen extends ConsumerStatefulWidget {
   ConsumerState<MyBetsScreen> createState() => _MyBetsScreenState();
 }
 
-class _MyBetsScreenState extends ConsumerState<MyBetsScreen> with TickerProviderStateMixin {
+class _MyBetsScreenState extends ConsumerState<MyBetsScreen> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late TabController _tabController;
   int _currentTabIndex = 0;
+  
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_onTabChanged);
+    
+    // Đăng ký observer
+    WidgetsBinding.instance.addObserver(this);
+    
+    // Refresh tab "En cours" khi mở screen lần đầu
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(refreshBetsProvider.notifier).refreshOngoingBets();
+    });
+  }
+  
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Refresh khi app được resume và đang ở tab "En cours"
+    if (state == AppLifecycleState.resumed && _currentTabIndex == 0) {
+      ref.read(refreshBetsProvider.notifier).refreshOngoingBets();
+    }
+  }
+  
+  void forceRefresh() {
+    if (_currentTabIndex == 0) {
+      ref.read(refreshBetsProvider.notifier).refreshOngoingBets();
+    }
   }
 
   @override
   void dispose() {
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
+    // Remove observer
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

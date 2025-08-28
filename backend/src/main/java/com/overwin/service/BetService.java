@@ -117,7 +117,7 @@ public class BetService {
         user.setBalance(newBalance);
         userRepository.save(user);
         
-        return new BetResponseDto(savedBet.getId(), "Đặt cược thành công", newBalance, true);
+        return new BetResponseDto(savedBet.getId(), "Pari réussi", newBalance, true);
     }
 
     private List<BetDto> convertToSimpleBetDtos(List<Bet> bets) {

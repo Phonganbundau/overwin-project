@@ -12,6 +12,7 @@ import 'package:overwin_mobile/shared/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overwin_mobile/modules/bets/providers/games.notifier.dart';
 import 'package:overwin_mobile/modules/auth/providers/auth_provider.dart';
+import 'package:overwin_mobile/modules/my_bets/providers/bets_provider.dart';
 
 class AppLayout extends ConsumerWidget {
   final Widget child;
@@ -84,8 +85,13 @@ class AppLayout extends ConsumerWidget {
                 duration: Duration(seconds: 3),
               ),
             );
+          } else {
+    
+            Future.delayed(const Duration(milliseconds: 100), () {
+              // Refresh ongoing bets (tab "En cours")
+              ref.read(refreshBetsProvider.notifier).refreshOngoingBets();
+            });
           }
-          // Nếu đã đăng nhập, không làm gì - onTap sẽ xử lý navigation
         },
       ),
     );
@@ -133,6 +139,8 @@ class _TabIndexedStackState extends State<_TabIndexedStack> {
       setState(() {
         _currentIndex = widget.selectedIndex;
       });
+      
+
     }
   }
 

@@ -248,6 +248,12 @@ class _BetsSummarySheetFooterState extends ConsumerState<BetsSummarySheetFooter>
                   Navigator.of(context).pop();
                   
                   if (result['success']) {
+                    
+                    if (result['newBalance'] != null) {
+                      final newBalance = (result['newBalance'] as num).toDouble();
+                      ref.read(authProvider.notifier).updateBalance(newBalance);
+                    }
+                    
                     // Réinitialiser les sélections
                     ref.read(selectedOutcomesProvider.notifier).state = [];
                     

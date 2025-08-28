@@ -149,6 +149,24 @@ class AuthNotifier extends StateNotifier<User?> {
       await SecureStorageService.clearAuthData();
     }
   }
+
+  // Update user balance after successful bet
+  void updateBalance(double newBalance) {
+    if (state != null) {
+      final updatedUser = User(
+        id: state!.id,
+        email: state!.email,
+        firstName: state!.firstName,
+        lastName: state!.lastName,
+        username: state!.username,
+        dateOfBirth: state!.dateOfBirth,
+        phoneNumber: state!.phoneNumber,
+        balance: newBalance,
+        token: state!.token,
+      );
+      state = updatedUser;
+    }
+  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, User?>((ref) {
