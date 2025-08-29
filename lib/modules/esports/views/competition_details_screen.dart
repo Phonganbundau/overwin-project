@@ -69,12 +69,23 @@ class _Header extends StatelessWidget {
         if (competition.icon.isNotEmpty)
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              competition.icon,
-              width: 36,
-              height: 36,
-              fit: BoxFit.cover,
-            ),
+            child: competition.icon.startsWith('http')
+              ? Image.network(
+                  competition.icon,
+                  width: 36,
+                  height: 36,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => 
+                    const Icon(Icons.emoji_events, color: Colors.white, size: 36),
+                )
+              : Image.asset(
+                  competition.icon,
+                  width: 36,
+                  height: 36,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => 
+                    const Icon(Icons.emoji_events, color: Colors.white, size: 36),
+                ),
           ),
         const SizedBox(width: 10),
         Expanded(
