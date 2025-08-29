@@ -182,13 +182,19 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               if (mounted) {
           if (result['success'] == true) {
             Navigator.of(context).pop(); // Close verification dialog
-            Navigator.pop(context); // Close signup screen
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Email vérifié avec succès ! Vous pouvez maintenant vous connecter.'),
                 backgroundColor: Colors.green,
               ),
             );
+            // Navigate to sign in after a short delay
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) {
+                Navigator.pop(context); // Close signup screen
+                SignInScreen.show(context); // Open sign in bottom sheet
+              }
+            });
           } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

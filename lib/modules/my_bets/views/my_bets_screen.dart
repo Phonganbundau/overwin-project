@@ -1117,26 +1117,44 @@ Widget _getOutcomeIndicator(String status) {
 // Helper function to format match time
 String _formatMatchTime(String? dateString) {
   if (dateString == null || dateString.isEmpty) {
-    return 'Demain 14:28';
+    return 'TBD';
   }
   
-  // Check if the date is tomorrow
-  final now = DateTime.now();
-  final tomorrow = DateTime(now.year, now.month, now.day + 1);
-  
-  // Try to parse the date string
   try {
     // Parse date in format dd/MM/yyyy HH:mm
     final parts = dateString.split(' ');
     if (parts.length >= 2) {
-      final time = parts[1]; // Extract the time part
-      return 'Demain $time';
+      final datePart = parts[0]; // dd/MM/yyyy
+      final timePart = parts[1]; // HH:mm
+      
+      // Parse the date
+      final dateParts = datePart.split('/');
+      if (dateParts.length == 3) {
+        final day = int.parse(dateParts[0]);
+        final month = int.parse(dateParts[1]);
+        final year = int.parse(dateParts[2]);
+        
+        final matchDate = DateTime(year, month, day);
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final tomorrow = today.add(const Duration(days: 1));
+        
+        if (matchDate.isAtSameMomentAs(today)) {
+          return 'Aujourd\'hui $timePart';
+        } else if (matchDate.isAtSameMomentAs(tomorrow)) {
+          return 'Demain $timePart';
+        } else {
+          // Format as dd/MM HH:mm for other dates
+          return '${day.toString().padLeft(2, '0')}/${month.toString().padLeft(2, '0')} $timePart';
+        }
+      }
     }
   } catch (e) {
-    // If parsing fails, return a default format
+    // If parsing fails, return the original string
+    return dateString;
   }
   
-  return 'Demain 14:28';
+  return dateString;
 }
 
 // Helper function to get reward label based on status
