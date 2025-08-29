@@ -44,32 +44,14 @@ final rewards = [
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 16),
       itemBuilder: (_, index) {
-        if (index == 0) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Boutique non disponible dans la version bêta. Vous pouvez prévisualiser les récompenses.',
-                style: TextStyle(color: Colors.white70),
-              ),
-            ),
-          );
-        }
-
-        final reward = rewards[index - 1];
+        final reward = rewards[index];
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: _RewardCard(reward: reward),
         );
       },
       separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemCount: rewards.length + 1,
+      itemCount: rewards.length,
     );
   }
 }

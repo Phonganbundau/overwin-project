@@ -19,6 +19,38 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 // Global navigator key for deep links
 final globalNavigatorKey = GlobalKey<NavigatorState>();
 
+/// Widget to show a modal bottom sheet after the build phase completes
+class _DelayedModalLauncher extends StatefulWidget {
+  final Function(BuildContext) builder;
+  
+  const _DelayedModalLauncher({required this.builder});
+
+  @override
+  State<_DelayedModalLauncher> createState() => _DelayedModalLauncherState();
+}
+
+class _DelayedModalLauncherState extends State<_DelayedModalLauncher> {
+  @override
+  void initState() {
+    super.initState();
+    // Schedule the bottom sheet to open after this frame completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        widget.builder(context);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Return a container that will be replaced by our router once the modal is closed
+    return const Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SizedBox.shrink(),
+    );
+  }
+}
+
 final GoRouter goRouter = GoRouter(
   initialLocation: '/paris',
   navigatorKey: globalNavigatorKey,
@@ -26,11 +58,21 @@ final GoRouter goRouter = GoRouter(
     /// Routes hors layout : pas d'AppBar/NavBar
     GoRoute(
       path: '/signin',
-      builder: (context, state) => const SignInScreen(),
+      builder: (context, state) {
+        // We'll return a wrapper that will show the bottom sheet after the build is complete
+        return _DelayedModalLauncher(
+          builder: (context) => SignInScreen.show(context),
+        );
+      },
     ),
     GoRoute(
       path: '/signup',
-      builder: (context, state) => const SignUpScreen(),
+      builder: (context, state) {
+        // We'll return a wrapper that will show the bottom sheet after the build is complete
+        return _DelayedModalLauncher(
+          builder: (context) => SignUpScreen.show(context),
+        );
+      },
     ),
     GoRoute(
       path: '/verify-email',

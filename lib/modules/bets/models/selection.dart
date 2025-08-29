@@ -7,7 +7,7 @@ class Selection {
   final double odd;
   final String status;
 
-  const Selection({
+  Selection({
     required this.id,
     required this.marketId,
     required this.name,
@@ -18,12 +18,12 @@ class Selection {
 
   factory Selection.fromJson(Map<String, dynamic> json) {
     return Selection(
-      id: json['id'] as int,
-      marketId: json['marketId'] as int,
-      name: json['name'] as String,
-      code: json['code'] as String,
-      odd: (json['odd'] as num).toDouble(),
-      status: json['status'] as String,
+      id: json['id']?.toInt() ?? 0,
+      marketId: json['marketId']?.toInt() ?? 0,
+      name: json['name']?.toString() ?? '',
+      code: json['code']?.toString() ?? '',
+      odd: (json['odd'] is num) ? json['odd'].toDouble() : 1.0,
+      status: json['status']?.toString() ?? '',
     );
   }
 

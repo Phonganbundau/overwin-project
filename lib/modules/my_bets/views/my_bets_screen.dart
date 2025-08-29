@@ -293,6 +293,7 @@ Map<String, dynamic> _convertBetToMap(Bet bet) {
     'result': bet.result,
     'winAmount': bet.winAmount,
     'sport': _getSportCode(selection?.sportName),
+    'sportIcon': selection?.sportIcon,
     'score': selection?.gameScore,
     'opponent1Name': selection?.opponent1Name,
     'opponent2Name': selection?.opponent2Name,
@@ -331,6 +332,7 @@ Map<String, dynamic> _convertCombineBetToMap(Bet bet) {
       'opponent1Name': selection.opponent1Name,
       'opponent2Name': selection.opponent2Name,
       'sport': _getSportCode(selection.sportName),
+      'sportIcon': selection.sportIcon,
     });
   }
   
@@ -434,7 +436,7 @@ class _SimpleBetCard extends StatelessWidget {
             // Sport icon and player/team
             Row(
               children: [
-                _getSportIcon(bet['sport']),
+                _getSportIconFromApi(bet['sportIcon']),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -928,7 +930,7 @@ class _IndividualBetItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              _getSportIcon(bet['sport']),
+              _getSportIconFromApi(bet['sportIcon']),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -1039,65 +1041,34 @@ class _IndividualBetItem extends StatelessWidget {
   }
 }
 
-Widget _getSportIcon(String sport) {
-  switch (sport) {
-    case 'tennis':
-      return Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: Colors.yellow,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(
-          Icons.sports_tennis,
-          color: Colors.white,
-          size: 16,
-        ),
-      );
-    case 'football':
-      return Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: Colors.grey,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(
-          Icons.sports_soccer,
-          color: Colors.white,
-          size: 16,
-        ),
-      );
-    case 'rocket_league':
-      return Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(
-          Icons.rocket,
-          color: Colors.white,
-          size: 16,
-        ),
-      );
-    default:
-      return Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: Colors.grey,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(
-          Icons.sports,
-          color: Colors.white,
-          size: 16,
-        ),
-      );
+Widget _getSportIconFromApi(String? sportIcon) {
+  if (sportIcon == null || sportIcon.isEmpty) {
+    return const SizedBox.shrink();
   }
+  
+  return Container(
+    width: 24,
+    height: 24,
+    decoration: BoxDecoration(
+      color: Colors.transparent,
+      shape: BoxShape.circle,
+    ),
+    child: ClipOval(
+      child: sportIcon.startsWith('http') 
+        ? Image.network(
+            sportIcon,
+            width: 24,
+            height: 24,
+            fit: BoxFit.contain,
+          )
+        : Image.asset(
+            sportIcon,
+            width: 24,
+            height: 24,
+            fit: BoxFit.contain,
+          ),
+    ),
+  );
 }
 
 Widget _getOutcomeIndicator(String status) {

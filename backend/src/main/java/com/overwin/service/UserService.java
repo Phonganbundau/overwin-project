@@ -6,9 +6,8 @@ import com.overwin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
 
 @Service
 public class UserService {
@@ -41,16 +40,15 @@ public class UserService {
         user.setBalance(1000.0); // Starting balance
         user.setEmailVerified(false); // Email chưa được xác nhận
         
-        // Tạo verification token
-        String verificationToken = UUID.randomUUID().toString();
-        user.setVerificationToken(verificationToken);
-        user.setVerificationTokenExpires(LocalDateTime.now().plusHours(24)); // Token hết hạn sau 24h
+        // Tạo mã xác thực 5 chữ số
+        String verificationCode = generateVerificationCode();
+        user.setVerificationCode(verificationCode);
         
         User savedUser = userRepository.save(user);
         
         // Gửi email xác nhận
         try {
-            emailService.sendVerificationEmail(user.getEmail(), user.getUsername(), verificationToken);
+            emailService.sendVerificationEmail(user.getEmail(), user.getUsername(), verificationCode);
         } catch (Exception e) {
             // Log error nhưng không throw exception để user vẫn được tạo
             System.err.println("Error sending verification email: " + e.getMessage());
@@ -115,23 +113,22 @@ public class UserService {
         userRepository.save(user);
     }
     
-    public boolean verifyEmail(String token) {
-        Optional<User> userOpt = userRepository.findByVerificationToken(token);
+    public boolean verifyEmailWithCode(String email, String code) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             return false;
         }
         
         User user = userOpt.get();
         
-        // Kiểm tra token có hết hạn không
-        if (user.getVerificationTokenExpires().isBefore(LocalDateTime.now())) {
+        // Kiểm tra mã xác thực
+        if (!code.equals(user.getVerificationCode())) {
             return false;
         }
         
         // Xác thực email
         user.setEmailVerified(true);
-        user.setVerificationToken(null);
-        user.setVerificationTokenExpires(null);
+        user.setVerificationCode(null);
         userRepository.save(user);
         
         // Gửi email chào mừng
@@ -142,6 +139,12 @@ public class UserService {
         }
         
         return true;
+    }
+    
+    private String generateVerificationCode() {
+        Random random = new Random();
+        int code = 10000 + random.nextInt(90000); // Tạo số từ 10000 đến 99999
+        return String.valueOf(code);
     }
     
     public boolean isEmailVerified(String email) {

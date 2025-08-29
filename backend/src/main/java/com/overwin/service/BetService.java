@@ -228,13 +228,16 @@ public class BetService {
                             }
                         }
                         
-                        // Fetch competition information
-                        Competition competition = market.getCompetition();
-                        if (competition != null) {
-                            selectionDto.setCompetitionName(competition.getName());
+                        // Fetch competition and sport information from Game
+                        if (game != null) {
+                            // Get competition info
+                            Competition competition = game.getCompetition();
+                            if (competition != null) {
+                                selectionDto.setCompetitionName(competition.getName());
+                            }
                             
-                            // Fetch sport information from competition
-                            Esport esport = competition.getEsport();
+                            // Get sport info directly from Game
+                            Esport esport = game.getEsport();
                             if (esport != null) {
                                 selectionDto.setSportName(esport.getName());
                                 selectionDto.setSportIcon(esport.getIcon());

@@ -62,12 +62,9 @@ class GameOdds extends StatelessWidget {
       print('Error parsing markets: $e');
     }
     
-    // Fallback to mock data if no valid outcomes available
+    // If no valid outcomes available, return empty widget
     if (outcomes.isEmpty) {
-      outcomes = [
-        {'id': 1, 'name': 'Team 1', 'oddValue': 2.0, 'betTypeName': 'Vainqueur du match'},
-        {'id': 2, 'name': 'Team 2', 'oddValue': 3.0, 'betTypeName': 'Vainqueur du match'},
-      ];
+      return const SizedBox.shrink();
     }
 
     return Padding(

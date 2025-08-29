@@ -2,6 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:overwin_mobile/shared/services/secure_storage_service.dart';
 
+class EmailVerificationException implements Exception {
+  final Map<String, dynamic> data;
+  EmailVerificationException(this.data);
+  
+  @override
+  String toString() => 'Email verification required: ${data['email']}';
+}
+
 class ApiService {
   static const String baseUrl ='http://192.168.1.132:8080/api';
   
@@ -64,6 +72,9 @@ class ApiService {
       
       if (response.statusCode == 200 || response.statusCode == 201) {
         return responseBody;
+      } else if (response.statusCode == 403) {
+        // Special handling for 403 status (email not verified)
+        throw EmailVerificationException(responseBody);
       } else {
         // Check if response contains error message
         final errorMessage = responseBody['message'] ?? 'Failed to post data: ${response.statusCode}';

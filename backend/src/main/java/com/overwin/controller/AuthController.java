@@ -52,7 +52,11 @@ public class AuthController {
             
             // Check if email is verified
             if (!user.getEmailVerified()) {
-                return ResponseEntity.badRequest().body(new LoginResponse("Veuillez vérifier votre email avant de vous connecter. Un lien de vérification a été envoyé à votre adresse email."));
+                Map<String, Object> response = new HashMap<>();
+                response.put("emailVerified", false);
+                response.put("email", user.getEmail());
+                response.put("message", "Veuillez vérifier votre email avant de vous connecter. Un code de vérification a été envoyé à votre adresse email.");
+                return ResponseEntity.status(403).body(response);
             }
             
             // Generate JWT token
@@ -98,25 +102,33 @@ public class AuthController {
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<Map<String, Object>> verifyEmail(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> verifyEmailWithCode(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            String token = request.get("token");
-            if (token == null || token.isEmpty()) {
+            String email = request.get("email");
+            String code = request.get("code");
+            
+            if (email == null || email.isEmpty()) {
                 response.put("success", false);
-                response.put("message", "Token manquant");
+                response.put("message", "Email manquant");
                 return ResponseEntity.badRequest().body(response);
             }
             
-            boolean isVerified = userService.verifyEmail(token);
+            if (code == null || code.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Code de vérification manquant");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            boolean isVerified = userService.verifyEmailWithCode(email, code);
             
             if (isVerified) {
                 response.put("success", true);
                 response.put("message", "Email vérifié avec succès ! Votre compte est maintenant actif.");
             } else {
                 response.put("success", false);
-                response.put("message", "Token invalide ou expiré. Veuillez demander un nouveau lien de vérification.");
+                response.put("message", "Code de vérification invalide. Veuillez vérifier le code et réessayer.");
             }
             
             return ResponseEntity.ok(response);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:overwin_mobile/modules/auth/providers/auth_provider.dart';
+import 'package:overwin_mobile/modules/auth/views/sign_up_screen.dart';
 import 'package:overwin_mobile/shared/theme/app_colors.dart';
 import 'package:overwin_mobile/shared/services/error_handler.dart';
 import 'package:overwin_mobile/shared/widgets/loading_overlay.dart';
@@ -11,6 +12,29 @@ class SignInScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<SignInScreen> createState() => _SignInScreenState();
+  
+  static Future<void> show(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => Padding(
+        // Add padding to avoid bottom overflow
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: FractionallySizedBox(
+          heightFactor: 1.0,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            child: const SignInScreen(),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
@@ -46,33 +70,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           // Log error để debug
           print('SignIn Error in SignInScreen: $e');
           
-          final errorMessage = ErrorHandler.getErrorMessage(e);
-          
-          // Hiển thị thông báo lỗi với màu sắc phù hợp
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: errorMessage.contains('Veuillez vérifier votre email') 
-                  ? Colors.orange 
-                  : Colors.red,
-              duration: const Duration(seconds: 5),
-              action: errorMessage.contains('Veuillez vérifier votre email') 
-                  ? SnackBarAction(
-                      label: 'Vérifier',
-                      textColor: Colors.white,
-                      onPressed: () {
-                        // Có thể thêm logic để gửi lại email xác nhận
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Vérifiez votre boîte email pour le lien de vérification'),
-                            backgroundColor: Colors.blue,
-                          ),
-                        );
-                      },
-                    )
-                  : null,
-            ),
-          );
+          // Kiểm tra nếu là EmailNotVerifiedException
+          if (e is EmailNotVerifiedException) {
+            _showVerificationCodeDialog(e.email);
+          } else {
+            final errorMessage = ErrorHandler.getErrorMessage(e);
+            
+            // Hiển thị thông báo lỗi với màu sắc phù hợp
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(errorMessage),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 5),
+              ),
+            );
+          }
         }
       } finally {
         if (mounted) {
@@ -84,6 +96,139 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
   }
 
+  void _showVerificationCodeDialog(String email) {
+    final verificationController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Vérification Email'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              const Icon(
+                Icons.email,
+                size: 60,
+                color: Colors.blue,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Un code de vérification a été envoyé à $email',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Veuillez saisir le code de 5 chiffres pour activer votre compte.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: verificationController,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                maxLength: 5,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 8),
+                decoration: const InputDecoration(
+                  hintText: '12345',
+                  border: OutlineInputBorder(),
+                  counterText: '',
+                ),
+              ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _verifyCodeFromLogin(email, verificationController.text);
+              },
+              child: const Text('Vérifier'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  Future<void> _verifyCodeFromLogin(String email, String code) async {
+    if (code.length != 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez saisir un code de 5 chiffres')),
+      );
+      return;
+    }
+    
+    try {
+      final result = await ref.read(authProvider.notifier).verifyEmailWithCode(
+        email: email,
+        code: code,
+      );
+      
+      if (mounted) {
+        if (result['success'] == true) {
+          Navigator.of(context).pop(); // Close verification dialog
+          
+          // Try to login again with the same credentials
+          setState(() {
+            _isLoading = true;
+          });
+          
+          try {
+            await ref.read(authProvider.notifier).signIn(
+              _emailController.text,
+              _passwordController.text,
+            );
+            if (mounted) {
+              context.go('/paris'); // Navigate to main app
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Erreur de connexion: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          } finally {
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+              });
+            }
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Code de vérification invalide'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
@@ -91,15 +236,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       message: 'Connexion en cours...',
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
+        resizeToAvoidBottomInset: true,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Form(
               key: _formKey,
-              child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 40),
+                  // Close button
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => context.go('/paris'),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   // Logo
                   Center(
                     child: Image.asset(
@@ -121,33 +276,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
-                  
-                  // Email verification notice
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.info, color: Colors.blue, size: 20),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Vérifiez votre email après l\'inscription pour activer votre compte',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 20),
 
                   // Email field
                   Container(
@@ -248,7 +376,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       GestureDetector(
-                        onTap: () => context.go('/signup'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          SignUpScreen.show(context);
+                        },
                         child: const Text(
                           'S\'inscrire',
                           style: TextStyle(
@@ -261,6 +392,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   ),
                 ],
               ),
+                ),
             ),
           ),
         ),

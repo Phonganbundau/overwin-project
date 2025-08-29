@@ -1,6 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overwin_mobile/shared/services/auth_service.dart';
 import 'package:overwin_mobile/shared/services/secure_storage_service.dart';
+import 'package:overwin_mobile/shared/services/api_service.dart';
+
+class EmailNotVerifiedException implements Exception {
+  final String email;
+  EmailNotVerifiedException(this.email);
+  
+  @override
+  String toString() => 'Email not verified: $email';
+}
 
 class User {
   final String id;
@@ -80,9 +89,9 @@ class AuthNotifier extends StateNotifier<User?> {
       // Log error để debug
       print('SignIn Error in AuthNotifier: $e');
       
-      // Kiểm tra nếu là lỗi xác thực email
-      if (e.toString().contains('Veuillez vérifier votre email')) {
-        throw Exception('Veuillez vérifier votre email avant de vous connecter. Un lien de vérification a été envoyé à votre adresse email.');
+      // Kiểm tra nếu là EmailVerificationException từ API
+      if (e is EmailVerificationException) {
+        throw EmailNotVerifiedException(e.data['email'] ?? email);
       }
       
       throw Exception('Login failed: $e');
@@ -113,6 +122,17 @@ class AuthNotifier extends StateNotifier<User?> {
       // User will need to verify email first, then sign in manually
     } catch (e) {
       throw Exception('Registration failed: $e');
+    }
+  }
+  
+  Future<Map<String, dynamic>> verifyEmailWithCode({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      return await AuthService.verifyEmailWithCode(email: email, code: code);
+    } catch (e) {
+      throw Exception('Email verification failed: $e');
     }
   }
 

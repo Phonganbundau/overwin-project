@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:overwin_mobile/modules/auth/providers/auth_provider.dart';
+import 'package:overwin_mobile/modules/auth/views/sign_in_screen.dart';
 import 'package:overwin_mobile/shared/theme/app_colors.dart';
 import 'package:overwin_mobile/shared/services/error_handler.dart';
 
@@ -10,6 +11,29 @@ class SignUpScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
+  
+  static Future<void> show(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => Padding(
+        // Add padding to avoid bottom overflow
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: FractionallySizedBox(
+          heightFactor: 1.0,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            child: const SignUpScreen(),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
@@ -94,15 +118,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
   
   void _showEmailVerificationDialog() {
+    _showVerificationCodeDialog();
+  }
+  
+  void _showVerificationCodeDialog() {
+    final verificationController = TextEditingController();
+    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Inscription réussie !'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          title: const Text('Vérification Email'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               const Icon(
                 Icons.email,
                 size: 60,
@@ -110,36 +141,104 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Un email de vérification a été envoyé à ${_emailController.text}',
+                'Un code de vérification a été envoyé à ${_emailController.text}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Veuillez vérifier votre email et cliquer sur le lien de vérification pour activer votre compte.',
+                'Veuillez saisir le code de 5 chiffres pour activer votre compte.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
-            ],
+              const SizedBox(height: 20),
+              TextField(
+                controller: verificationController,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                maxLength: 5,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 8),
+                decoration: const InputDecoration(
+                  hintText: '12345',
+                  border: OutlineInputBorder(),
+                  counterText: '',
+                ),
+              ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                context.go('/signin');
+                Navigator.pop(context);
+                SignInScreen.show(context);
               },
-              child: const Text('Aller à la connexion'),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _verifyCode(verificationController.text);
+              },
+              child: const Text('Vérifier'),
             ),
           ],
         );
       },
     );
   }
+  
+  Future<void> _verifyCode(String code) async {
+    if (code.length != 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez saisir un code de 5 chiffres')),
+      );
+      return;
+    }
+    
+    try {
+      final result = await ref.read(authProvider.notifier).verifyEmailWithCode(
+        email: _emailController.text,
+        code: code,
+      );
+      
+      if (mounted) {
+        if (result['success'] == true) {
+          Navigator.of(context).pop(); // Close verification dialog
+          Navigator.pop(context); // Close signup screen
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Email vérifié avec succès ! Vous pouvez maintenant vous connecter.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          SignInScreen.show(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Code de vérification invalide'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
@@ -148,6 +247,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Close button
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => context.go('/paris'),
+                  ),
+                ),
                 const SizedBox(height: 20),
                 // Logo
                 Center(
@@ -445,7 +552,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       style: TextStyle(color: Colors.grey),
                     ),
                     GestureDetector(
-                      onTap: () => context.go('/signin'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        SignInScreen.show(context);
+                      },
                       child: const Text(
                         'Se connecter',
                         style: TextStyle(

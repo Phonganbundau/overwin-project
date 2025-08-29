@@ -43,11 +43,8 @@ public class User {
     @Column(name = "email_verified", nullable = false)
     private Boolean emailVerified;
     
-    @Column(name = "verification_token")
-    private String verificationToken;
-    
-    @Column(name = "verification_token_expires")
-    private LocalDateTime verificationTokenExpires;
+    @Column(name = "verification_code")
+    private String verificationCode;
     
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -70,8 +67,7 @@ public class User {
         this.balance = balance;
         this.password = password;
         this.emailVerified = false; // Mặc định email chưa được xác nhận
-        this.verificationToken = null;
-        this.verificationTokenExpires = null;
+        this.verificationCode = null;
     }
     
     // Getters and Setters
@@ -108,11 +104,8 @@ public class User {
     public Boolean getEmailVerified() { return emailVerified; }
     public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
     
-    public String getVerificationToken() { return verificationToken; }
-    public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
-    
-    public LocalDateTime getVerificationTokenExpires() { return verificationTokenExpires; }
-    public void setVerificationTokenExpires(LocalDateTime verificationTokenExpires) { this.verificationTokenExpires = verificationTokenExpires; }
+    public String getVerificationCode() { return verificationCode; }
+    public void setVerificationCode(String verificationCode) { this.verificationCode = verificationCode; }
     
     public List<Bet> getBets() { return bets; }
     public void setBets(List<Bet> bets) { this.bets = bets; }

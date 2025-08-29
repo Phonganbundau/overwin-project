@@ -26,59 +26,91 @@ class GameCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Game image
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: game.imageUrl.isNotEmpty 
-                  ? Image.asset(
-                      game.imageUrl,
-                      height: 120,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 120,
-                          width: double.infinity,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.sports_esports, size: 50),
-                        );
-                      },
-                    )
-                  : Container(
-                      height: 120,
-                      width: double.infinity,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.sports_esports, size: 50),
-                    ),
-            ),
             GameTitle(
-              esportIcon: game.esportIcon.isNotEmpty ? game.esportIcon : 'assets/icons/rocket-league-logo.png',
-              competitionIcon: game.competitionIcon.isNotEmpty ? game.competitionIcon : 'assets/icons/rlcs.png',
-              competitionName: game.competitionName.isNotEmpty ? game.competitionName : 'Competition',
+              esportIcon: game.esportIcon,
+              competitionIcon: game.competitionIcon,
+              competitionName: game.competitionName,
               name: game.name.isNotEmpty ? game.name : 'Unknown Game',
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GameInfo(opponents: game.opponents, scheduledAt: game.scheduledAt),
-                    GameOdds(
-                      opponents: game.opponents, 
-                      markets: game.markets, 
-                      gameId: game.id, 
-                      esportIcon: game.esportIcon.isNotEmpty ? game.esportIcon : 'assets/icons/rocket-league-logo.png'
-                    )
-                  ],
-                ),
-              ),
-            ),
+            game.imageUrl.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GameInfo(opponents: game.opponents, scheduledAt: game.scheduledAt),
+                          GameOdds(
+                            opponents: game.opponents, 
+                            markets: game.markets, 
+                            gameId: game.id, 
+                            esportIcon: game.esportIcon.isNotEmpty ? game.esportIcon : 'assets/icons/rocket-league-logo.png'
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          Image.network(
+                            game.imageUrl,
+                            width: double.infinity,
+                            height: 220,
+                            fit: BoxFit.cover,
+                            errorBuilder: (ctx, error, stack) {
+                              return Container(
+                                width: double.infinity,
+                                height: 220,
+                                alignment: Alignment.topCenter,
+                                child: const Icon(
+                                  Icons.error,
+                                  color: Colors.white,
+                                ),
+                              );
+                            },
+                          ),
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  stops: const [0.3, 1.0],
+                                  colors: [Colors.transparent, Colors.black],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          Positioned(
+                            left: 0,
+                            bottom: 0,
+                            right: 0,
+                            child: Column(
+                              children: [
+                                GameInfo(opponents: game.opponents, scheduledAt: game.scheduledAt),
+                                GameOdds(
+                                  opponents: game.opponents, 
+                                  markets: game.markets, 
+                                  gameId: game.id, 
+                                  esportIcon: game.esportIcon
+                                )
+                              ],
+                            )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),

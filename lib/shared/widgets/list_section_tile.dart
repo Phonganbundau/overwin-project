@@ -30,15 +30,25 @@ class ListSectionTile extends StatelessWidget {
               ),
               clipBehavior: Clip.hardEdge,
               child: (iconPath != null && iconPath!.trim().isNotEmpty)
-                  ? Image.asset(
-                      iconPath!,
-                      fit: BoxFit.cover,
-                      width: 32,
-                      height: 32,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox.shrink();
-                      },
-                    )
+                  ? (iconPath!.startsWith('http')
+                      ? Image.network(
+                          iconPath!,
+                          fit: BoxFit.contain,
+                          width: 32,
+                          height: 32,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox.shrink();
+                          },
+                        )
+                      : Image.asset(
+                          iconPath!,
+                          fit: BoxFit.contain,
+                          width: 32,
+                          height: 32,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox.shrink();
+                          },
+                        ))
                   : const SizedBox.shrink(),
             ),
             const SizedBox(width: 16),

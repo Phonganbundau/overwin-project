@@ -53,4 +53,18 @@ class AuthService {
     final response = await ApiService.get('/auth/profile');
     return response;
   }
+  
+  // Verify email with code
+  static Future<Map<String, dynamic>> verifyEmailWithCode({
+    required String email,
+    required String code,
+  }) async {
+    final data = {
+      'email': email,
+      'code': code,
+    };
+    
+    final response = await ApiService.post('/auth/verify-email', data);
+    return response;
+  }
 }

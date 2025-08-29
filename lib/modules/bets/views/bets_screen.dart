@@ -15,14 +15,6 @@ class BetsScreen extends ConsumerWidget {
       data: (gamesList) => Column(
         children: [
           Expanded(child: GameList(games: gamesList)),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              'Touchez une cote pour l’ajouter. Touchez une carte match pour voir les paris détaillés (bêta: aucun pari).',
-              style: const TextStyle(color: Colors.white54, fontSize: 12),
-              textAlign: TextAlign.center,
-            ),
-          ),
         ],
       ),
       loading: () => const Center(child: CustomCircularProgressIndicator()),
