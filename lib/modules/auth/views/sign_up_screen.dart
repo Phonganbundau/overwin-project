@@ -12,28 +12,7 @@ class SignUpScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
   
-  static Future<void> show(BuildContext context) {
-    return showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      useSafeArea: true,
-      builder: (context) => Padding(
-        // Add padding to avoid bottom overflow
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: FractionallySizedBox(
-          heightFactor: 1.0,
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            child: const SignUpScreen(),
-          ),
-        ),
-      ),
-    );
-  }
+
 }
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
@@ -171,8 +150,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.pop(context);
-                SignInScreen.show(context);
               },
               child: const Text('Annuler'),
             ),
@@ -202,18 +179,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         code: code,
       );
       
-      if (mounted) {
-        if (result['success'] == true) {
-          Navigator.of(context).pop(); // Close verification dialog
-          Navigator.pop(context); // Close signup screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Email vérifié avec succès ! Vous pouvez maintenant vous connecter.'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          SignInScreen.show(context);
-        } else {
+              if (mounted) {
+          if (result['success'] == true) {
+            Navigator.of(context).pop(); // Close verification dialog
+            Navigator.pop(context); // Close signup screen
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Email vérifié avec succès ! Vous pouvez maintenant vous connecter.'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(result['message'] ?? 'Code de vérification invalide'),
@@ -247,15 +223,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Close button
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => context.go('/paris'),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 60),
                 // Logo
                 Center(
                   child: Image.asset(

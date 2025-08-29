@@ -67,12 +67,7 @@ final GoRouter goRouter = GoRouter(
     ),
     GoRoute(
       path: '/signup',
-      builder: (context, state) {
-        // We'll return a wrapper that will show the bottom sheet after the build is complete
-        return _DelayedModalLauncher(
-          builder: (context) => SignUpScreen.show(context),
-        );
-      },
+      builder: (context, state) => const SignUpScreen(),
     ),
     GoRoute(
       path: '/verify-email',

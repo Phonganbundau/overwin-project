@@ -378,7 +378,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
-                          SignUpScreen.show(context);
+                          context.push('/signup');
                         },
                         child: const Text(
                           'S\'inscrire',
