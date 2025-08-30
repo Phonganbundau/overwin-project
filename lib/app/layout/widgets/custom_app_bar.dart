@@ -160,12 +160,25 @@ class _AccountSheet extends ConsumerWidget {
           padding: EdgeInsets.only(bottom: bottomInset),
           child: Column(
             children: [
+              // Header with close button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                child: Row(
+                  children: [
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
-                      const SizedBox(height: 30),
                       // Token display banner with share button
                       Container(
                         width: double.infinity,
