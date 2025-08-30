@@ -143,7 +143,7 @@ public class UserService {
     
     private String generateVerificationCode() {
         Random random = new Random();
-        int code = 10000 + random.nextInt(90000); // Tạo số từ 10000 đến 99999
+        int code = 100000 + random.nextInt(900000); // Tạo số từ 100000 đến 999999
         return String.valueOf(code);
     }
     

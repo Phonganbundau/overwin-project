@@ -160,83 +160,82 @@ class _AccountSheet extends ConsumerWidget {
           padding: EdgeInsets.only(bottom: bottomInset),
           child: Column(
             children: [
-              const SizedBox(height: 30),
-              // Token display banner with share button
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF141b2e),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    // Username row (moved to top)
-                    Text(
-                      user.username,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // Token icon row
-                    Image.asset('assets/icons/coin.png', height: 40),
-                    const SizedBox(height: 12),
-                    
-                    // Token amount row
-                    Text(
-                      user.balance.toString(),
-                      style: const TextStyle(
-                        color: Colors.white, 
-                        fontSize: 28, 
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'monospace',
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    
-                    // Share button with blue background
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop(); // Close bottom sheet first
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Indisponible dans la version bêta')),
-                        );
-                      },
-                      child: Container(
-                        width: 130,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1C67FF),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'PARTAGER',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                              letterSpacing: 0.8,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
+                      const SizedBox(height: 30),
+                      // Token display banner with share button
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF141b2e),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            // Username row (moved to top)
+                            Text(
+                              user.username,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            
+                            // Token icon row
+                            Image.asset('assets/icons/coin.png', height: 40),
+                            const SizedBox(height: 12),
+                            
+                            // Token amount row
+                            Text(
+                              user.balance.toString(),
+                              style: const TextStyle(
+                                color: Colors.white, 
+                                fontSize: 28, 
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'monospace',
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            
+                            // Share button with blue background
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop(); // Close bottom sheet first
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                                );
+                              },
+                              child: Container(
+                                width: 130,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1C67FF),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'PARTAGER',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       // En ce moment section
                       _AccountSection(
                         title: 'En ce moment',

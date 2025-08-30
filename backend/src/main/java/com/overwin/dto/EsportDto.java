@@ -1,7 +1,6 @@
 package com.overwin.dto;
 
 import com.overwin.entity.Esport;
-import com.overwin.entity.Competition;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
