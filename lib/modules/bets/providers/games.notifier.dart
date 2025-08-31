@@ -6,16 +6,30 @@ import 'package:overwin_mobile/shared/services/esports_service.dart';
 class GamesNotifier extends AsyncNotifier<List<Game>> {
   @override
   Future<List<Game>> build() async {
-    final apiData = await EsportsService.getUpcomingGames();
-    return apiData.map((gameData) => Game.fromApi(gameData)).toList();
+    try {
+      final apiData = await EsportsService.getUpcomingGames();
+      if (apiData.isNotEmpty) {
+        return apiData.map((gameData) => Game.fromApi(gameData)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<void> refresh() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    try {
       final apiData = await EsportsService.getUpcomingGames();
-      return apiData.map((gameData) => Game.fromApi(gameData)).toList();
-    });
+      if (apiData.isNotEmpty) {
+        state = AsyncValue.data(apiData.map((gameData) => Game.fromApi(gameData)).toList());
+      } else {
+        state = const AsyncValue.data([]);
+      }
+    } catch (e) {
+      state = const AsyncValue.data([]);
+    }
   }
 
 

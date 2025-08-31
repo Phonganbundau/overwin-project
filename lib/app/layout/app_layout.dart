@@ -79,12 +79,6 @@ class AppLayout extends ConsumerWidget {
             // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
             context.go('/signin');
             // Hiển thị thông báo
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Veuillez vous connecter pour accéder à vos paris'),
-                duration: Duration(seconds: 3),
-              ),
-            );
           } else {
     
             Future.delayed(const Duration(milliseconds: 100), () {

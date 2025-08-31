@@ -7,16 +7,30 @@ class CompetitionsNotifier extends AsyncNotifier<List<Competition>> {
 
   @override
   Future<List<Competition>> build() async {
-    final apiData = await EsportsService.getAllCompetitions();
-    return apiData.map((competitionData) => Competition.fromApi(competitionData)).toList();
+    try {
+      final apiData = await EsportsService.getAllCompetitions();
+      if (apiData.isNotEmpty) {
+        return apiData.map((competitionData) => Competition.fromApi(competitionData)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
   }
   
   Future<void> refresh() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    try {
       final apiData = await EsportsService.getAllCompetitions();
-      return apiData.map((competitionData) => Competition.fromApi(competitionData)).toList();
-    });
+      if (apiData.isNotEmpty) {
+        state = AsyncValue.data(apiData.map((competitionData) => Competition.fromApi(competitionData)).toList());
+      } else {
+        state = const AsyncValue.data([]);
+      }
+    } catch (e) {
+      state = const AsyncValue.data([]);
+    }
   }
   
 

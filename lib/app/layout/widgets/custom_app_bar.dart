@@ -84,27 +84,30 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
             ),
             const SizedBox(width: _containerSpacing),
 
-            GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  sheetAnimationStyle: AnimationStyle(
-                    duration: Duration(milliseconds: AppModalBottomSheet.bottomSheetDuration),
+            Padding(
+              padding: const EdgeInsets.all(8.0), // Mở rộng vùng nhấn
+              child: GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    sheetAnimationStyle: AnimationStyle(
+                      duration: Duration(milliseconds: AppModalBottomSheet.bottomSheetDuration),
+                    ),
+                    builder: (_) => _AccountSheet(user: user),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(_containerPadding),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(27, 27, 27, 1),
+                    borderRadius: BorderRadius.circular(_accountContainerBorderRadius),
                   ),
-                  builder: (_) => _AccountSheet(user: user),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(_containerPadding),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(27, 27, 27, 1),
-                  borderRadius: BorderRadius.circular(_accountContainerBorderRadius),
-                ),
-                child: const Icon(
-                  Icons.account_circle_outlined,
-                  color: Colors.white,
-                  size: _accountIconSize,
+                  child: const Icon(
+                    Icons.account_circle_outlined,
+                    color: Colors.white,
+                    size: _accountIconSize,
+                  ),
                 ),
               ),
             ),
@@ -138,12 +141,19 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(_appBarHeight);
 }
 
-class _AccountSheet extends ConsumerWidget {
+class _AccountSheet extends ConsumerStatefulWidget {
   final User user;
   const _AccountSheet({required this.user});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AccountSheet> createState() => _AccountSheetState();
+}
+
+class _AccountSheetState extends ConsumerState<_AccountSheet> {
+  bool _showProfileDetails = false;
+
+  @override
+  Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return FractionallySizedBox(
       widthFactor: 1.0,
@@ -160,15 +170,30 @@ class _AccountSheet extends ConsumerWidget {
           padding: EdgeInsets.only(bottom: bottomInset),
           child: Column(
             children: [
-              // Header with close button
+              // Header with close button and back button
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
                 child: Row(
                   children: [
+                    if (_showProfileDetails)
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          setState(() {
+                            _showProfileDetails = false;
+                          });
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      )
+                    else
+                      const Spacer(),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
@@ -177,227 +202,332 @@ class _AccountSheet extends ConsumerWidget {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      // Token display banner with share button
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF141b2e),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            // Username row (moved to top)
-                            Text(
-                              user.username,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            
-                            // Token icon row
-                            Image.asset('assets/icons/coin.png', height: 40),
-                            const SizedBox(height: 12),
-                            
-                            // Token amount row
-                            Text(
-                              user.balance.toString(),
-                              style: const TextStyle(
-                                color: Colors.white, 
-                                fontSize: 28, 
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'monospace',
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            
-                            // Share button with blue background
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop(); // Close bottom sheet first
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Indisponible dans la version bêta')),
-                                );
-                              },
-                              child: Container(
-                                width: 130,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF1C67FF),
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'PARTAGER',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 11,
-                                      letterSpacing: 0.8,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // En ce moment section
-                      _AccountSection(
-                        title: 'En ce moment',
-                        children: [
-                          _AccountTile(
-                            icon: Icons.local_offer,
-                            iconColor: Colors.yellow,
-                            title: 'Code Promo',
-                            subtitle: 'Entrez un code promo',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                          _AccountTile(
-                            icon: Icons.people,
-                            iconColor: Colors.yellow,
-                            title: 'Parrainer des amis',
-                            subtitle: 'Gagnez des tokens en parrainant',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Gérer mon compte section
-                      _AccountSection(
-                        title: 'Gérer mon compte',
-                        children: [
-                          _AccountTile(
-                            icon: Icons.person,
-                            iconColor: Colors.brown,
-                            title: 'Mon profil',
-                            subtitle: 'Modifier mes informations',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              context.go('/profile');
-                            },
-                          ),
-                          _AccountTile(
-                            icon: Icons.settings,
-                            iconColor: Colors.yellow,
-                            title: 'Préférences',
-                            subtitle: 'Paramètres de l\'application',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                          _AccountTile(
-                            icon: Icons.language,
-                            iconColor: Colors.blue,
-                            title: 'Langue',
-                            subtitle: 'Français',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Aide & infos légales section
-                      _AccountSection(
-                        title: 'Aide & infos légales',
-                        children: [
-                          _AccountTile(
-                            icon: Icons.help_center,
-                            iconColor: Colors.blue,
-                            title: 'Centre d\'aide',
-                            subtitle: 'Support et assistance',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                          _AccountTile(
-                            icon: Icons.question_answer,
-                            iconColor: Colors.green,
-                            title: 'FAQ',
-                            subtitle: 'Questions fréquemment posées',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                          _AccountTile(
-                            icon: Icons.description,
-                            iconColor: Colors.orange,
-                            title: 'Conditions d\'utilisation',
-                            subtitle: 'Lire les conditions',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                          _AccountTile(
-                            icon: Icons.privacy_tip,
-                            iconColor: Colors.purple,
-                            title: 'Politique de confidentialité',
-                            subtitle: 'Lire la politique',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                          _AccountTile(
-                            icon: Icons.support_agent,
-                            iconColor: Colors.teal,
-                            title: 'Support client',
-                            subtitle: 'Contacter notre équipe',
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close bottom sheet first
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Indisponible dans la version bêta')),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      // Logout button inside scrollable content
-                      _LogoutButton(),
-                    ],
-                  ),
+                  child: _showProfileDetails ? _buildProfileDetails() : _buildMainMenu(),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMainMenu() {
+    return Column(
+      children: [
+        // Token display banner with share button
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF141b2e),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              // Username row (moved to top)
+              Text(
+                widget.user.username,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 12),
+              
+              // Token icon row
+              Image.asset('assets/icons/coin.png', height: 40),
+              const SizedBox(height: 12),
+              
+              // Token amount row
+              Text(
+                widget.user.balance.toString(),
+                style: const TextStyle(
+                  color: Colors.white, 
+                  fontSize: 28, 
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'monospace',
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // Share button with blue background
+              GestureDetector(
+                onTap: () {
+                  // NULL action
+                },
+                child: Container(
+                  width: 130,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1C67FF),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'PARTAGER',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        // En ce moment section
+        _AccountSection(
+          title: 'En ce moment',
+          children: [
+            _AccountTile(
+              icon: Icons.local_offer,
+              iconColor: Colors.yellow,
+              title: 'Code Promo',
+              subtitle: 'Entrez un code promo',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+            _AccountTile(
+              icon: Icons.people,
+              iconColor: Colors.yellow,
+              title: 'Parrainer des amis',
+              subtitle: 'Gagnez des tokens en parrainant',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Gérer mon compte section
+        _AccountSection(
+          title: 'Gérer mon compte',
+          children: [
+            _AccountTile(
+              icon: Icons.person,
+              iconColor: Colors.brown,
+              title: 'Mon profil',
+              subtitle: 'Modifier mes informations',
+              onTap: () {
+                setState(() {
+                  _showProfileDetails = true;
+                });
+              },
+            ),
+            _AccountTile(
+              icon: Icons.settings,
+              iconColor: Colors.yellow,
+              title: 'Préférences',
+              subtitle: 'Paramètres de l\'application',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+            _AccountTile(
+              icon: Icons.language,
+              iconColor: Colors.blue,
+              title: 'Langue',
+              subtitle: 'Français',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Aide & infos légales section
+        _AccountSection(
+          title: 'Aide & infos légales',
+          children: [
+            _AccountTile(
+              icon: Icons.help_center,
+              iconColor: Colors.blue,
+              title: 'Centre d\'aide',
+              subtitle: 'Support et assistance',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+            _AccountTile(
+              icon: Icons.question_answer,
+              iconColor: Colors.green,
+              title: 'FAQ',
+              subtitle: 'Questions fréquemment posées',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+            _AccountTile(
+              icon: Icons.description,
+              iconColor: Colors.orange,
+              title: 'Conditions d\'utilisation',
+              subtitle: 'Lire les conditions',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+            _AccountTile(
+              icon: Icons.privacy_tip,
+              iconColor: Colors.purple,
+              title: 'Politique de confidentialité',
+              subtitle: 'Lire la politique',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+            _AccountTile(
+              icon: Icons.support_agent,
+              iconColor: Colors.teal,
+              title: 'Support client',
+              subtitle: 'Contacter notre équipe',
+              onTap: () {
+                Navigator.of(context).pop(); // Close bottom sheet first
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Indisponible dans la version bêta')),
+                );
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        // Logout button inside scrollable content
+        _LogoutButton(),
+      ],
+    );
+  }
+
+  Widget _buildProfileDetails() {
+    return Column(
+      children: [
+        // Mon identité section
+        _AccountSection(
+          title: 'Mon identité',
+          children: [
+            if (widget.user.firstName != null)
+              _ProfileInfoTile(
+                icon: Icons.person_outline,
+                iconColor: Colors.blue,
+                title: 'Prénom',
+                value: widget.user.firstName!,
+              ),
+            if (widget.user.lastName != null)
+              _ProfileInfoTile(
+                icon: Icons.person_outline,
+                iconColor: Colors.blue,
+                title: 'Nom',
+                value: widget.user.lastName!,
+              ),
+            _ProfileInfoTile(
+              icon: Icons.cake,
+              iconColor: Colors.pink,
+              title: 'Date de naissance',
+              value: '${widget.user.dateOfBirth.day}/${widget.user.dateOfBirth.month}/${widget.user.dateOfBirth.year}',
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        
+        // Mes informations de contact section
+        _AccountSection(
+          title: 'Mes informations de contact',
+          children: [
+            if (widget.user.email != null)
+              _ProfileInfoTile(
+                icon: Icons.email,
+                iconColor: Colors.green,
+                title: 'Email',
+                value: widget.user.email!,
+              ),
+            _ProfileInfoTile(
+              icon: Icons.phone,
+              iconColor: Colors.orange,
+              title: 'Téléphone',
+              value: widget.user.phoneNumber,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        
+        // Mon compte section
+        _AccountSection(
+          title: 'Mon compte',
+          children: [
+            _ProfileInfoTile(
+              icon: Icons.account_circle,
+              iconColor: Colors.purple,
+              title: 'Pseudo',
+              value: widget.user.username,
+            ),
+            _ProfileInfoTile(
+              icon: Icons.calendar_today,
+              iconColor: Colors.teal,
+              title: 'Date de création du compte',
+              value: '01/01/2024', // Placeholder 
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        
+        // Clôturer mon compte button
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: GestureDetector(
+            onTap: () {
+              
+            },
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: Text(
+                  'Clôturer mon compte',
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -504,6 +634,60 @@ class _AccountTile extends StatelessWidget {
             const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProfileInfoTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String value;
+
+  const _ProfileInfoTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black, 
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.grey, 
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

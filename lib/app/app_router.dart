@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:overwin_mobile/app/layout/app_layout.dart';
+import 'package:overwin_mobile/app/splash/splash_screen.dart';
 import 'package:overwin_mobile/modules/auth/views/sign_in_screen.dart';
 import 'package:overwin_mobile/modules/auth/views/sign_up_screen.dart';
 import 'package:overwin_mobile/modules/auth/views/email_verification_screen.dart';
@@ -22,9 +23,14 @@ final globalNavigatorKey = GlobalKey<NavigatorState>();
 
 
 final GoRouter goRouter = GoRouter(
-  initialLocation: '/paris',
+  initialLocation: '/splash',
   navigatorKey: globalNavigatorKey,
   routes: [
+    /// Splash screen - màn hình đầu tiên
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
     /// Routes hors layout : pas d'AppBar/NavBar
     GoRoute(
       path: '/signin',

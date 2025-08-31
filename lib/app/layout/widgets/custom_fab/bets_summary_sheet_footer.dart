@@ -123,44 +123,44 @@ class _BetsSummarySheetFooterState extends ConsumerState<BetsSummarySheetFooter>
               ],
             ),
        
-            if (ref.watch(selectedOutcomesProvider).length > 1)
-              Builder(
-                builder: (context) {
-                  final outcomes = ref.watch(selectedOutcomesProvider);
-                  final gameIds = outcomes.map((o) => o.gameId).toSet();
-                  final hasConflict = gameIds.length < outcomes.length;
+            // if (ref.watch(selectedOutcomesProvider).length > 1)
+            //   Builder(
+            //     builder: (context) {
+            //       final outcomes = ref.watch(selectedOutcomesProvider);
+            //       final gameIds = outcomes.map((o) => o.gameId).toSet();
+            //       final hasConflict = gameIds.length < outcomes.length;
                   
-                  if (hasConflict) {
-                    return Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.red[900],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red[300]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.warning, color: Colors.white, size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Conflit détecté: Vous avez sélectionné les deux équipes du même match',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
+            //       if (hasConflict) {
+            //         return Container(
+            //           width: double.infinity,
+            //           margin: const EdgeInsets.only(bottom: 10),
+            //           padding: const EdgeInsets.all(12),
+            //           decoration: BoxDecoration(
+            //             color: Colors.red[900],
+            //             borderRadius: BorderRadius.circular(8),
+            //             border: Border.all(color: Colors.red[300]!),
+            //           ),
+            //           child: Row(
+            //             children: [
+            //               Icon(Icons.warning, color: Colors.white, size: 20),
+            //               const SizedBox(width: 8),
+            //               Expanded(
+            //                 child: Text(
+            //                   'Conflit détecté: Vous avez sélectionné les deux équipes du même match',
+            //                   style: TextStyle(
+            //                     color: Colors.white,
+            //                     fontSize: 12,
+            //                     fontWeight: FontWeight.w500,
+            //                   ),
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         );
+            //       }
+            //       return const SizedBox.shrink();
+            //     },
+            //   ),
             
             SizedBox(height: 10),
             GestureDetector(
@@ -169,14 +169,7 @@ class _BetsSummarySheetFooterState extends ConsumerState<BetsSummarySheetFooter>
                 final isLoggedIn = ref.read(isLoggedInProvider);
                 if (!isLoggedIn) {
                   // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
-                  context.go('/signin');
-                  // Hiển thị thông báo
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Veuillez vous connecter pour placer un pari'),
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
+                  context.go('/signin');       
                   return;
                 }
                 

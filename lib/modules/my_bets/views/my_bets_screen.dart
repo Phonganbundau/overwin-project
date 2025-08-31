@@ -91,7 +91,7 @@ class _MyBetsScreenState extends ConsumerState<MyBetsScreen> with TickerProvider
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 6),
             decoration: BoxDecoration(
               color: const Color(0xFF222327),
               borderRadius: BorderRadius.circular(12),
@@ -100,7 +100,7 @@ class _MyBetsScreenState extends ConsumerState<MyBetsScreen> with TickerProvider
               controller: _tabController,
               indicatorColor: Colors.white,
               labelColor: Colors.white,
-              unselectedLabelColor: Colors.grey,
+              unselectedLabelColor: Colors.white,
               labelStyle: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _OngoingBetsTab extends ConsumerWidget {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           itemCount: bets.length,
           itemBuilder: (context, index) {
             final bet = bets[index];
@@ -206,7 +206,7 @@ class _FinishedBetsTab extends ConsumerWidget {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           itemCount: bets.length,
           itemBuilder: (context, index) {
             final bet = bets[index];
@@ -251,7 +251,7 @@ class _WonBetsTab extends ConsumerWidget {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           itemCount: bets.length,
           itemBuilder: (context, index) {
             final bet = bets[index];
@@ -431,7 +431,7 @@ class _SimpleBetCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             
             // Sport icon and player/team
             Row(
@@ -453,7 +453,7 @@ class _SimpleBetCard extends StatelessWidget {
                       Text(
                         bet['betType'],
                         style: const TextStyle(
-                          color: Colors.grey,
+                          color: Colors.white,
                           fontSize: 14,
                         ),
                       ),
@@ -480,7 +480,7 @@ class _SimpleBetCard extends StatelessWidget {
             
             // Match date and score for finished/won bets
             if (showResult && bet['score'] != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -492,59 +492,34 @@ class _SimpleBetCard extends StatelessWidget {
                   children: [
                     // Match date
                     if (bet['date'] != null) ...[
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            color: Colors.grey,
-                            size: 16,
+                      Center(
+                        child: Text(
+                          bet['date'],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            bet['date'],
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                       const SizedBox(height: 8),
                     ],
                     // Match score
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.sports_score,
-                          color: Colors.white70,
-                          size: 16,
+                    Center(
+                      child: Text(
+                        '${bet['opponent1Name'] ?? ''} ${bet['score']} ${bet['opponent2Name'] ?? ''}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${bet['opponent1Name'] ?? ''} ${bet['score']} ${bet['opponent2Name'] ?? ''}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
             
-            if (bet['date'] != null && !showResult) ...[
-              const SizedBox(height: 8),
-              Text(
-                bet['date'],
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                ),
-              ),
-            ],
+
             
             if (!showResult) ...[
               const SizedBox(height: 8),
@@ -568,20 +543,13 @@ class _SimpleBetCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        _formatMatchTime(bet['date']),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
+                                         Text(
+                       _formatMatchTime(bet['date']),
+                       style: const TextStyle(
+                         color: Colors.white,
+                         fontSize: 12,
+                       ),
+                     ),
                     Expanded(
                       child: Text(
                         bet['opponent2Name'] ?? '',
@@ -602,70 +570,71 @@ class _SimpleBetCard extends StatelessWidget {
             const SizedBox(height: 16),
             
             // Financial info
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Mise:',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
+                // Mise row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Mise:',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            '${bet['stake']} ',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '${bet['stake']} ',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
-                          Image.asset('assets/icons/coin.png', height: 16),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                        Image.asset('assets/icons/coin.png', height: 16),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _getRewardLabel(bet['status']),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
+                
+                const SizedBox(height: 8),
+                
+                // Récompense row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _getRewardLabel(bet['status']),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            '${_getRewardValue(bet)} ',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '${_getRewardValue(bet)} ',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
-                          Image.asset('assets/icons/coin.png', height: 16),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                        Image.asset('assets/icons/coin.png', height: 18),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
             
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             
             // Reference and time
-            const SizedBox(height: 12),
+            const SizedBox(height: 0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -758,7 +727,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             
             // Outcome indicators with arrow
             Row(
@@ -790,101 +759,103 @@ class _CombineBetCardState extends State<_CombineBetCard> {
             
             const SizedBox(height: 16),
             
-            // Financial info
-            Row(
+                        // Financial info
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Cote totale:',
+                // Cote totale
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Cote totale:',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary.withOpacity(1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        widget.bet['totalOdds'].toString(),
                         style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.withOpacity(1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          widget.bet['totalOdds'].toString(),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 8),
+                
+                // Mise row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Mise:',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '${widget.bet['stake']} ',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Image.asset('assets/icons/coin.png', height: 16),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Mise:',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
+                
+                const SizedBox(height: 8),
+                
+                // Récompense row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _getRewardLabel(widget.bet['status']),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            '${widget.bet['stake']} ',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '${_getRewardValue(widget.bet)} ',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
-                          Image.asset('assets/icons/coin.png', height: 16),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                                                                  Expanded(
-                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       Text(
-                         _getRewardLabel(widget.bet['status']),
-                         style: const TextStyle(
-                           color: Colors.grey,
-                           fontSize: 12,
                         ),
-                       ),
-                       Row(
-                         children: [
-                           Text(
-                             '${_getRewardValue(widget.bet)} ',
-                             style: const TextStyle(
-                               color: Colors.white,
-                               fontSize: 14,
-                               fontWeight: FontWeight.w500,
-                             ),
-                           ),
-                           Image.asset('assets/icons/coin.png', height: 16),
-                         ],
-                       ),
-                     ],
-                   ),
-                 ),
+                        Image.asset('assets/icons/coin.png', height: 18),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
             
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             
             // Reference and time
-            const SizedBox(height: 12),
+            const SizedBox(height: 0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -976,7 +947,7 @@ class _IndividualBetItem extends StatelessWidget {
                   Text(
                     bet['date'],
                     style: const TextStyle(
-                      color: Colors.grey,
+                      color: Colors.white,
                       fontSize: 10,
                     ),
                   ),
@@ -987,10 +958,10 @@ class _IndividualBetItem extends StatelessWidget {
           // Match info
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(4),
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1000,24 +971,17 @@ class _IndividualBetItem extends StatelessWidget {
                     bet['opponent1Name'] ?? '',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: Text(
-                    _formatMatchTime(bet['date']),
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 10,
-                    ),
+                Text(
+                  _formatMatchTime(bet['date']),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
                   ),
                 ),
                 Expanded(
@@ -1025,7 +989,7 @@ class _IndividualBetItem extends StatelessWidget {
                     bet['opponent2Name'] ?? '',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.right,
@@ -1195,7 +1159,7 @@ class _EmptyBetsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
           color: const Color(0xFF222327),

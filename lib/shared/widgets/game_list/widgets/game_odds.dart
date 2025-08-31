@@ -31,9 +31,15 @@ class GameOdds extends StatelessWidget {
     
     try {
       if (markets.isNotEmpty) {
-        // Extract selections from markets
+        // Extract selections from markets - only from 1X2 market
         for (var market in markets) {
           if (market != null && market is Map<String, dynamic>) {
+            // Check if this is a 1X2 market
+            var marketType = market['type'];
+            if (marketType == null || marketType.toString() != "1X2") {
+              continue; // Skip non-1X2 markets
+            }
+            
             var selections = market['selections'];
             if (selections != null && selections is List) {
               for (var selection in selections) {

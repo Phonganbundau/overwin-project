@@ -124,13 +124,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               children: [
                 // Header with logo and close button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
                   child: Row(
                     children: [
                       // Close button
                       IconButton(
                         icon: const Icon(Icons.close, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
                       const Spacer(),
                       // Logo
@@ -146,7 +148,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 5),
+                const SizedBox(height: 2),
                 
                 // Login form container với sign up link bên trong
                 Expanded(
