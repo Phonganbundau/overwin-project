@@ -131,7 +131,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             children: [
               // Header with logo and close button
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
                 child: Row(
                   children: [
                     // Close button
@@ -153,7 +153,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 ),
               ),
               
-              const SizedBox(height: 5),
+              const SizedBox(height: 2),
               
               // Sign Up form container
               Expanded(
@@ -457,7 +457,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 ),
               ),
               
-              const SizedBox(height: 5),
+              const SizedBox(height: 2),
               
               // Sign in link below the container
               Padding(
