@@ -102,7 +102,7 @@ class _MyBetsScreenState extends ConsumerState<MyBetsScreen> with TickerProvider
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white,
               labelStyle: const TextStyle(
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
               ),
               unselectedLabelStyle: const TextStyle(
@@ -590,7 +590,7 @@ class _SimpleBetCard extends StatelessWidget {
                           '${bet['stake']} ',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -811,7 +811,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                           '${widget.bet['stake']} ',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -935,7 +935,7 @@ class _IndividualBetItem extends StatelessWidget {
                   bet['odds'].toString(),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
