@@ -470,7 +470,7 @@ class _SimpleBetCard extends StatelessWidget {
                     bet['odds'].toString(),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -784,7 +784,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                         widget.bet['totalOdds'].toString(),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -935,7 +935,7 @@ class _IndividualBetItem extends StatelessWidget {
                   bet['odds'].toString(),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
