@@ -581,7 +581,7 @@ class _SimpleBetCard extends StatelessWidget {
                       'Mise:',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 16,
                       ),
                     ),
                     Row(
@@ -590,7 +590,7 @@ class _SimpleBetCard extends StatelessWidget {
                           '${bet['stake']} ',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 15,
+                            fontSize: 15.5,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -610,7 +610,7 @@ class _SimpleBetCard extends StatelessWidget {
                       _getRewardLabel(bet['status']),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 16,
                       ),
                     ),
                     Row(
@@ -771,7 +771,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                       'Cote totale:',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 16,
                       ),
                     ),
                     Container(
@@ -802,7 +802,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                       'Mise:',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 16,
                       ),
                     ),
                     Row(
@@ -811,7 +811,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                           '${widget.bet['stake']} ',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 15,
+                            fontSize: 15.5,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -831,7 +831,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                       _getRewardLabel(widget.bet['status']),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 16,
                       ),
                     ),
                     Row(
