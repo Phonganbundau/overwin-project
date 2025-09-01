@@ -925,33 +925,20 @@ class _IndividualBetItem extends StatelessWidget {
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      bet['odds'].toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withOpacity(1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  bet['odds'].toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    bet['date'],
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),

@@ -228,19 +228,52 @@ public class BetService {
                             }
                         }
                         
-                        // Fetch competition and sport information from Game
+                        // Fetch competition and sport information
                         if (game != null) {
-                            // Get competition info
+                            // Case 1: Market has gameId - get info from Game
                             Competition competition = game.getCompetition();
                             if (competition != null) {
                                 selectionDto.setCompetitionName(competition.getName());
+                                
+                                // Get sport info from competition's esport
+                                Esport esport = competition.getEsport();
+                                if (esport != null) {
+                                    selectionDto.setSportName(esport.getName());
+                                    selectionDto.setSportIcon(esport.getIcon());
+                                }
                             }
                             
-                            // Get sport info directly from Game
-                            Esport esport = game.getEsport();
-                            if (esport != null) {
-                                selectionDto.setSportName(esport.getName());
-                                selectionDto.setSportIcon(esport.getIcon());
+                            // Also get sport info directly from Game (fallback)
+                            if (selectionDto.getSportName() == null) {
+                                Esport esport = game.getEsport();
+                                if (esport != null) {
+                                    selectionDto.setSportName(esport.getName());
+                                    selectionDto.setSportIcon(esport.getIcon());
+                                }
+                            }
+                        } else if (market.getCompetitionId() != null) {
+                            // Case 2: Market has competitionId but no gameId - get info directly from Competition
+                            Competition competition = market.getCompetition();
+                            if (competition != null) {
+                                selectionDto.setCompetitionName(competition.getName());
+                                
+                                // Get sport info from competition's esport
+                                Esport esport = competition.getEsport();
+                                if (esport != null) {
+                                    selectionDto.setSportName(esport.getName());
+                                    selectionDto.setSportIcon(esport.getIcon());
+                                }
+                                
+                                // For tournament markets, we don't have specific game date
+                                // Could set tournament end date if needed
+                                if (competition.getEndsAt() != null) {
+                                    selectionDto.setDateTime(competition.getEndsAt());
+                                    
+                                    // Format date for UI
+                                    DateTimeFormatter competitionDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                                    String formattedCompetitionDate = competition.getEndsAt().format(competitionDateFormatter);
+                                    selectionDto.setDate(formattedCompetitionDate);
+                                }
                             }
                         }
                     }
