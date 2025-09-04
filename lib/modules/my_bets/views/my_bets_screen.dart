@@ -342,7 +342,7 @@ Map<String, dynamic> _convertCombineBetToMap(Bet bet) {
 // Helper function to translate status from API to UI
 String _translateStatus(String status) {
   switch (status) {
-    case 'pending': return 'En cours';
+    case 'ongoing': return 'En cours';
     case 'won': return 'Gagné';
     case 'lost': return 'Perdu';
     case 'cancelled': return 'Annulé';
@@ -354,6 +354,7 @@ String _translateStatus(String status) {
 String _translateSelectionStatus(String status) {
   switch (status) {
     case 'pending': return 'en_cours';
+    case 'ongoing': return 'en_cours';
     case 'won': return 'gagné';
     case 'lost': return 'perdu';
     case 'cancelled': return 'annulé';
@@ -405,12 +406,13 @@ class _SimpleBetCard extends StatelessWidget {
             // Header with status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              
               children: [
                 Text(
                   'Simple',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -706,7 +708,7 @@ class _CombineBetCardState extends State<_CombineBetCard> {
                   'Combiné (${widget.bet['selections']})',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

@@ -5,6 +5,7 @@ import 'package:overwin_mobile/app/layout/widgets/custom_fab/bets_summary_sheet_
 import 'package:overwin_mobile/shared/theme/app_colors.dart';
 import 'package:overwin_mobile/shared/theme/app_modal_bottom_sheet.dart';
 import 'package:overwin_mobile/shared/widgets/game_list/providers/selected_outcomes_provider.dart';
+import 'package:overwin_mobile/shared/widgets/insufficient_tokens_dialog.dart';
 
 class BetsSummarySheet extends ConsumerWidget {
   const BetsSummarySheet({super.key});

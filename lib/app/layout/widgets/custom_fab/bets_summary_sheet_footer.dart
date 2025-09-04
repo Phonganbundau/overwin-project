@@ -7,6 +7,7 @@ import 'package:overwin_mobile/shared/theme/app_colors.dart';
 import 'package:overwin_mobile/shared/theme/app_spacing.dart';
 import 'package:overwin_mobile/shared/widgets/game_list/providers/total_odds_provider.dart';
 import 'package:overwin_mobile/shared/widgets/game_list/providers/selected_outcomes_provider.dart';
+import 'package:overwin_mobile/shared/widgets/insufficient_tokens_dialog.dart';
 
 class BetsSummarySheetFooter extends ConsumerStatefulWidget {
   const BetsSummarySheetFooter({super.key});
@@ -222,6 +223,14 @@ class _BetsSummarySheetFooterState extends ConsumerState<BetsSummarySheetFooter>
                 final stake = double.tryParse(_stake.replaceAll(',', '.')) ?? 0.0;
                 final totalOdds = double.tryParse(ref.read(totalOddsProvider).replaceAll(',', '.')) ?? 0.0;
                 
+                // Vérifier si l'utilisateur a assez de tokens
+                final user = ref.read(authProvider);
+                if (user != null && user.balance < stake) {
+                  // Afficher le dialog de solde insuffisant
+                  await InsufficientTokensDialog.show(context);
+                  return;
+                }
+                
                 // Afficher un indicateur de chargement
                 showDialog(
                   context: context,
@@ -258,10 +267,16 @@ class _BetsSummarySheetFooterState extends ConsumerState<BetsSummarySheetFooter>
                       SnackBar(content: Text(result['message'])),
                     );
                   } else {
-                    // Afficher un message d'erreur
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(result['message'])),
-                    );
+                    // Vérifier si c'est une erreur de solde insuffisant
+                    if (result['message'].toString().contains('pas assez de jeton')) {
+                      // Afficher le dialog de solde insuffisant
+                      await InsufficientTokensDialog.show(context);
+                    } else {
+                      // Afficher un message d'erreur normal
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(result['message'])),
+                      );
+                    }
                   }
                 } catch (e) {
                   // Fermer le dialogue de chargement

@@ -131,13 +131,6 @@ public class UserService {
         user.setVerificationCode(null);
         userRepository.save(user);
         
-        // Gửi email chào mừng
-        try {
-            emailService.sendWelcomeEmail(user.getEmail(), user.getUsername());
-        } catch (Exception e) {
-            System.err.println("Error sending welcome email: " + e.getMessage());
-        }
-        
         return true;
     }
     
@@ -150,5 +143,19 @@ public class UserService {
     public boolean isEmailVerified(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         return userOpt.map(User::getEmailVerified).orElse(false);
+    }
+    
+    public boolean deleteUser(Integer userId) {
+        try {
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isPresent()) {
+                userRepository.delete(userOpt.get());
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            System.err.println("Error deleting user: " + e.getMessage());
+            return false;
+        }
     }
 }

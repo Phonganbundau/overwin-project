@@ -11,7 +11,7 @@ class EmailVerificationException implements Exception {
 }
 
 class ApiService {
-  static const String baseUrl ='http://192.168.1.132:8080/api';
+  static const String baseUrl ='http://192.168.56.1:8080/api';
   
   // Headers
   static Map<String, String> get _defaultHeaders => {
@@ -72,12 +72,46 @@ class ApiService {
       
       if (response.statusCode == 200 || response.statusCode == 201) {
         return responseBody;
+      } else if (response.statusCode == 401) {
+        // Special handling for 401 status (unauthorized - wrong credentials)
+        final errorMessage = responseBody['message'] ?? 'L\'email ou le mot de passe est incorrect.';
+        throw Exception(errorMessage);
       } else if (response.statusCode == 403) {
         // Special handling for 403 status (email not verified)
         throw EmailVerificationException(responseBody);
       } else {
         // Check if response contains error message
         final errorMessage = responseBody['message'] ?? 'Failed to post data: ${response.statusCode}';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      if (e is Exception) {
+        rethrow; // Re-throw if it's already an Exception
+      } else {
+        throw Exception('Network error: $e');
+      }
+    }
+  }
+
+  // Generic DELETE request
+  static Future<dynamic> delete(String endpoint, {String? token}) async {
+    try {
+      final headers = token != null 
+          ? getAuthHeadersWithToken(token) 
+          : await getAuthHeaders();
+      final response = await http.delete(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: headers,
+      );
+      
+      // Parse response body
+      final responseBody = json.decode(response.body);
+      
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return responseBody;
+      } else {
+        // Check if response contains error message
+        final errorMessage = responseBody['message'] ?? 'Failed to delete data: ${response.statusCode}';
         throw Exception(errorMessage);
       }
     } catch (e) {

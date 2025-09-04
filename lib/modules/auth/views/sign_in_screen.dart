@@ -8,6 +8,8 @@ import 'package:overwin_mobile/shared/theme/app_colors.dart';
 import 'package:overwin_mobile/shared/services/error_handler.dart';
 import 'package:overwin_mobile/shared/widgets/loading_overlay.dart';
 import 'package:overwin_mobile/shared/theme/app_modal_bottom_sheet.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -67,11 +69,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             final errorMessage = ErrorHandler.getErrorMessage(e);
             
             // Hiển thị thông báo lỗi với màu sắc phù hợp
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(errorMessage),
+            showTopSnackBar(
+              Overlay.of(context),
+              CustomSnackBar.error(
+                message: errorMessage,
                 backgroundColor: Colors.red,
-                duration: const Duration(seconds: 5),
+                textStyle: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
             );
           }

@@ -94,7 +94,8 @@ class AuthNotifier extends StateNotifier<User?> {
         throw EmailNotVerifiedException(e.data['email'] ?? email);
       }
       
-      throw Exception('Login failed: $e');
+   
+      rethrow;
     }
   }
 

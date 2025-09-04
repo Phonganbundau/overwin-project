@@ -162,4 +162,43 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+    
+    @DeleteMapping("/delete-account")
+    public ResponseEntity<Map<String, Object>> deleteAccount(@RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Remove "Bearer " prefix
+            String jwtToken = token.substring(7);
+            String email = jwtService.extractUsername(jwtToken);
+            
+            // Find user by email
+            var userOpt = userService.findByEmail(email);
+            if (userOpt.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Utilisateur non trouvé");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            User user = userOpt.get();
+            
+            // Delete user account
+            boolean deleted = userService.deleteUser(user.getId());
+            
+            if (deleted) {
+                response.put("success", true);
+                response.put("message", "Compte supprimé avec succès");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "Erreur lors de la suppression du compte");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Erreur lors de la suppression: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

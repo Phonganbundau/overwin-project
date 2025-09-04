@@ -108,6 +108,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
   
   void _showEmailVerificationDialog() {
+
+    Navigator.of(context).pop();
     Navigator.push(
       context,
       MaterialPageRoute(

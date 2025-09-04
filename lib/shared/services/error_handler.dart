@@ -15,8 +15,10 @@ class ErrorHandler {
         return 'Impossible d\'envoyer les données. Réessayez plus tard.';
       }
       
-      if (errorString.contains('Invalid email or password')) {
-        return 'Email ou mot de passe incorrect.';
+      if (errorString.contains('Invalid email or password') || 
+          errorString.contains('L\'email ou le mot de passe est incorrect') ||
+          errorString.contains('Email ou mot de passe incorrect')) {
+        return 'L\'email ou le mot de passe est incorrect.';
       }
       
       if (errorString.contains('User with this email already exists')) {

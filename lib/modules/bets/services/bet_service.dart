@@ -60,9 +60,20 @@ class BetService {
         'betId': response['id'],
       };
     } catch (e) {
+      // Xử lý lỗi không đủ token từ backend
+      if (e.toString().contains('insufficient') || 
+          e.toString().contains('balance') || 
+          e.toString().contains('token')) {
+        return {
+          'success': false,
+          'message': 'Tu n\'as pas assez de jeton sur ton compte pour placer ce paris.',
+          'newBalance': null
+        };
+      }
+      
       return {
         'success': false,
-        'message': 'Lỗi: ${e.toString()}',
+        'message': 'Erreur: ${e.toString()}',
         'newBalance': null
       };
     }

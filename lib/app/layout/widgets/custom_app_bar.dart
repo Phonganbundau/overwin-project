@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:overwin_mobile/modules/auth/providers/auth_provider.dart';
 import 'package:overwin_mobile/shared/theme/app_modal_bottom_sheet.dart';
+import 'package:overwin_mobile/shared/services/account_service.dart';
+import 'package:overwin_mobile/shared/services/error_handler.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   static const double _appBarHeight = 49.0;
@@ -152,6 +156,119 @@ class _AccountSheet extends ConsumerStatefulWidget {
 class _AccountSheetState extends ConsumerState<_AccountSheet> {
   bool _showProfileDetails = false;
 
+  void _showDeleteAccountConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF222327),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            'Supprimer le compte',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            'Êtes-vous sûr de vouloir supprimer votre compte définitivement ?',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Annuler',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteAccount();
+              },
+              child: const Text(
+                'Supprimer',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAccount() async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Call delete account API
+      await AccountService.deleteAccount();
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      // Sign out user
+      await ref.read(authProvider.notifier).signOut();
+
+      // Close account sheet
+      Navigator.of(context).pop();
+
+      // Navigate to main screen
+      context.go('/paris');
+
+      // Show success message
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.success(
+          message: 'Compte supprimé avec succès',
+          backgroundColor: Colors.green,
+          textStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+      );
+    } catch (e) {
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      // Show error message
+      final errorMessage = ErrorHandler.getErrorMessage(e);
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: errorMessage,
+          backgroundColor: Colors.red,
+          textStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
@@ -229,7 +346,7 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
               Text(
                 widget.user.username,
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -253,27 +370,22 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
               ),
               const SizedBox(height: 20),
               
-              // Share button with blue background
-              GestureDetector(
-                onTap: () {
-                  // NULL action
-                },
-                child: Container(
-                  width: 130,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1C67FF),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'PARTAGER',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                        letterSpacing: 0.8,
-                      ),
+              // Share button with disabled appearance
+              Container(
+                width: 130,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Center(
+                  child: Text(
+                    'PARTAGER',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                      letterSpacing: 0.8,
                     ),
                   ),
                 ),
@@ -504,9 +616,7 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: GestureDetector(
-            onTap: () {
-              
-            },
+            onTap: _showDeleteAccountConfirmation,
             child: Container(
               width: double.infinity,
               height: 50,
