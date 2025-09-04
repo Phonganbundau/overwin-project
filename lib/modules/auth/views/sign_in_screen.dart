@@ -311,6 +311,33 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               ],
                             ),
                           ),
+                          
+                          const SizedBox(height: 20),
+                          
+                          // X Logo and Twitter handle
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/icons/X-Logo.png',
+                                  height: 18,
+                                  width: 18,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  '@overwin_off',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

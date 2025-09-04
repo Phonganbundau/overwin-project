@@ -199,6 +199,38 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         );
                       },
                     ),
+                    
+                    const SizedBox(height: 30),
+                    
+                    // X Logo and Twitter handle
+                    AnimatedBuilder(
+                      animation: _loaderAnimation,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _loaderAnimation.value,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/icons/X-Logo.png',
+                                height: 20,
+                                width: 20,
+                                fit: BoxFit.contain,
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                '@overwin_off',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
